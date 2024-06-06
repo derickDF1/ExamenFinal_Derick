@@ -1,0 +1,84 @@
+﻿@page "/smartphones"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+
+<h3>Agregar Smartphone</h3>
+
+<EditForm Model="@smartphone">
+    <div class="form-group">
+        <label for="NumSerie">Numero de serie: </label>
+        <InputNumber id="NumSerie" @bind-Value="smartphone.NumSerie" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Marca">Marca del smartphone: </label>
+        <InputText id="Marca" @bind-Value="smartphone.Marca" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="Modelo">Modelo del smartphone: </label>
+        <InputText id="Modelo" @bind-Value="smartphone.Modelo" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="SistemaOperativo">Sistema operativo del smartphone: </label>
+        <InputText id="SistemaOperativo" @bind-Value="smartphone.SistemaOperativo" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="NumCamaras">Cuantas camaras tiene el smartphone?: </label>
+        <InputNumber id="NumCamaras" @bind-Value="smartphone.NumCamaras" class="form-control" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" @onclick="@Guardar">Guardar</button>
+    </div>
+</EditForm>
+
+@if (smartphones != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>NumSerie</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>SistemaOperativo</th>
+                <th>NumCamaras</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var smartphone in smartphones)
+            {
+                <tr>
+                    <td>@smartphone.NumSerie</td>
+                    <td>@smartphone.Marca</td>
+                    <td>@smartphone.Modelo</td>
+                    <td>@smartphone.SistemaOperativo</td>
+                    <td>@smartphone.NumCamaras</td>
+                    <td>
+                        <button class="btn btn-warning"
+                                @onclick="@(() => NavigationManager.NavigateTo($"/smartphones-editar/{smartphone.NumSerie}"))">
+                            Editar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Smartphone smartphone = new Smartphone();
+    private List<Smartphone> smartphones = new List<Smartphone>();
+
+    protected async Task Guardar()
+    {
+        smartphones.Add(smartphone);
+        await localStorage.SetItemAsync("smartphones", smartphones);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        smartphones = await localStorage.GetItemAsync<List<Smartphone>>("smartphones");
+        if (smartphones == null)
+            smartphones = new List<Smartphone>();
+    }
+}
